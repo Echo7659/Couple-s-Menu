@@ -525,13 +525,18 @@ onPullDownRefresh(() => {
       align-items: center;
       justify-content: center;
       padding: 30rpx;
-      text-align: center;
+      box-sizing: border-box;
 
       .cover-name {
         font-size: 28rpx;
         color: #6A4C93;
         font-weight: 600;
         line-height: 1.5;
+        text-align: center;
+        width: 100%;
+        word-break: break-all;
+        word-wrap: break-word;
+        display: block;
       }
     }
   }
