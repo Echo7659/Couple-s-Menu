@@ -1,0 +1,95 @@
+// APP下的处理
+//.iphone_pb {
+//  padding-bottom: constant(safe-area-inset-bottom);
+//  /*兼容 IOS<11.2*/
+//  padding-bottom: env(safe-area-inset-bottom);
+//  /*兼容 IOS>11.2*/
+//}
+//.iphone_mb {
+//  margin-bottom: constant(safe-area-inset-bottom);
+//  /*兼容 IOS<11.2*/
+//  margin-bottom: env(safe-area-inset-bottom);
+//  /*兼容 IOS>11.2*/
+//}
+page{
+  width: 100%;
+  height:100%;
+}
+
+
+
+
+/* 文字基本颜色 */
+//--color-text-main: #303133; // 标题,正文用色
+//--color-text-regular: #606266; // 辅助文案,描述等文字角色
+//--color-text-secondary: #909399; // 描述,脚注等文字用色
+//--color-text-disable: #c0c4cc; // 禁用与站位符
+//--color-text-link:#5878b4; // 链接跳转的颜色
+//
+///* 背景颜色 */
+//--color-bg-base: #F3F4F5; // 页面默认背景色
+//--color-bg-lightcolor: #f7f8f9; // 页面或者内容区块的浅色背景色
+//--color-bg-white: #fff; // 内容区块的填充色
+//--color-bg-mask:rgba(0, 0, 0, 0.7); // 通用蒙层色
+//
+//
+////  分割线与边框
+//--color-division-line:#e6e6e6; // 通用的分割线色
+//--color-border:#dcdcdc // 按钮边框或内容区块边框用色
+
+
+// 主题色公用类名
+.color-text-main{
+  color:var(--color-text-main)
+}
+.color-text-regular{
+  color:var(--color-text-regular)
+}
+.color-text-secondary{
+  color:var(--color-text-secondary)
+}
+.color-text-disable{
+  color:var(--color-text-disable)
+}
+.color-text-link{
+  color:var(--color-text-link)
+}
+.color-text-warning{
+  color:var(--color-function-warning)
+}
+.color-text-success{
+  color:var(--color-function-success)
+}
+.color-text-error{
+  color:var(--color-function-error)
+}
+.color-bg-base{
+  background:var(--color-bg-base)
+}
+.color-bg-lightcolor{
+  background:var(--color-bg-lightcolor)
+}
+.color-bg-mask{
+  background:var(--color-bg-mask)
+}
+
+
+.page-container{
+  flex:1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-base);
+}
+.content-container{
+  flex:1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// 解决uni的toast图标显示位置不准确的问题
+:deep(.uni-toast){
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

@@ -1,0 +1,169 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "^(?!z-paging-refresh|z-paging-load-more)z-paging(.*)": "z-paging/components/z-paging$1/z-paging$1.vue",
+      "^w-(.*)": "@uni-ui/code-ui/components/w-$1/index.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/home/home",
+      "style": {
+        "navigationBarTitleText": "我们的纪念日",
+        "enablePullDownRefresh": true,
+        "navigationStyle": "custom",
+        "enableShareAppMessage": true
+      }
+    },
+    {
+      "path": "pages/anniversary/anniversary",
+      "style": {
+        "navigationBarTitleText": "纪念日",
+        "enablePullDownRefresh": true,
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/anniversary/detail",
+      "style": {
+        "navigationBarTitleText": "纪念日详情",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/recipe/recipe",
+      "style": {
+        "navigationBarTitleText": "私人菜谱",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/order/index",
+      "style": {
+        "navigationBarTitleText": "我的菜谱",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/order/order",
+      "style": {
+        "navigationBarTitleText": "点餐",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/order/confirm",
+      "style": {
+        "navigationBarTitleText": "确认订单",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/order/result",
+      "style": {
+        "navigationBarTitleText": "订单结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/food/category-manage",
+      "style": {
+        "navigationBarTitleText": "分类管理",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/food/food-manage",
+      "style": {
+        "navigationBarTitleText": "菜品管理",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/order/my-orders",
+      "style": {
+        "navigationBarTitleText": "订单",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/target/index",
+      "style": {
+        "navigationBarTitleText": "打卡目标",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/target/detail",
+      "style": {
+        "navigationBarTitleText": "目标详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": {
+        "navigationBarTitleText": "个人中心",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/user/login",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/setup",
+      "style": {
+        "navigationBarTitleText": "完善信息",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "情侣菜谱",
+    "navigationStyle": "default",
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B9D",
+    "borderStyle": "white",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "./static/images/home.png",
+        "selectedIconPath": "./static/images/home-active.png"
+      },
+      {
+        "pagePath": "pages/order/index",
+        "text": "菜谱",
+        "iconPath": "./static/images/recipe.png",
+        "selectedIconPath": "./static/images/recipe-active.png"
+      },
+      {
+        "pagePath": "pages/target/index",
+        "text": "打卡",
+        "iconPath": "./static/images/checkin.png",
+        "selectedIconPath": "./static/images/checkin-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "./static/images/profile.png",
+        "selectedIconPath": "./static/images/profile-active.png"
+      }
+    ]
+  }
+}

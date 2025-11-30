@@ -1,0 +1,29 @@
+&{
+  /* 行为相关颜色 */
+  --color-primary: #00B85B;
+  --color-function-success: #00b85b;
+  --color-function-warning: #ff6f27;
+  --color-function-error: #f13942;
+  --color-function-prompt:#00673d;
+
+  // 以下部分UI未提供,为预留的主题变量,防止变换主题之后导致一些色值不兼容
+  --buttom-button-text-color: #fff; // 底部的按钮字体颜色
+
+  /* 文字基本颜色 */
+  --color-text-main: #303133; // 标题,正文用色
+  --color-text-regular: #606266; // 辅助文案,描述等文字角色
+  --color-text-secondary: #909399; // 描述,脚注等文字用色
+  --color-text-disable: #c0c4cc; // 禁用与占位符
+  --color-text-link:#5878b4; // 链接跳转的颜色
+
+  /* 背景颜色 */
+  --color-bg-base: #F3F4F5; // 页面默认背景色
+  --color-bg-lightcolor: #f7f8f9; // 页面或者内容区块的浅色背景色
+  --color-bg-white: #fff; // 内容区块的填充色
+  --color-bg-mask:rgba(0, 0, 0, 0.7); // 通用蒙层色
+
+//  分割线与边框
+  --color-division-line:#e6e6e6; // 通用的分割线色
+  --color-border:#dcdcdc; // 按钮边框或内容区块边框用色
+}
+
