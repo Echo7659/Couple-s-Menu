@@ -109,8 +109,8 @@ type OSSConfig struct {
 
 var ossConfig = OSSConfig{
 	Endpoint:        "oss-cn-chengdu.aliyuncs.com",
-	AccessKeyID:     "LTAI5tNSrjY28s3ax9F5RegJ",
-	AccessKeySecret: "dnrgeAlMpMpePDkYODrfklMSNzvwDD",
+	AccessKeyID:     "",
+	AccessKeySecret: "",
 	BucketName:      "menu-echo",
 	Domain:          "https://menu-echo.oss-cn-chengdu.aliyuncs.com",
 }
