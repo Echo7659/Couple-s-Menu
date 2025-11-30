@@ -23,7 +23,7 @@ func (m *MenuService) Create(req app.Menu) (err error) {
 
 // Delete 删除菜谱
 func (m *MenuService) Delete(id uint) (err error) {
-	err = global.GVA_DB.Delete(&app.Menu{}).Where("id = ?", id).Error
+	err = global.GVA_DB.Where("id = ?", id).Delete(&app.Menu{}).Error
 	if err != nil {
 		global.GVA_LOG.Error("删除菜谱失败", zap.Error(err))
 		return err

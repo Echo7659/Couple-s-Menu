@@ -24,7 +24,7 @@ func (f *FoodService) Create(req app.Food) (err error) {
 
 // Delete 删除菜品
 func (f *FoodService) Delete(id uint) (err error) {
-	err = global.GVA_DB.Delete(&app.Food{}).Where("id = ?", id).Error
+	err = global.GVA_DB.Where("id = ?", id).Delete(&app.Food{}).Error
 	if err != nil {
 		global.GVA_LOG.Error("删除菜品失败", zap.Error(err))
 		return err
@@ -141,7 +141,7 @@ func (f *FoodService) UpdateCategory(p app.Category) (err error) {
 }
 
 func (f *FoodService) DeleteCategory(id uint) (err error) {
-	err = global.GVA_DB.Delete(&app.Category{}).Where("id = ?", id).Error
+	err = global.GVA_DB.Where("id = ?", id).Delete(&app.Category{}).Error
 	if err != nil {
 		global.GVA_LOG.Error("删除菜品分类失败", zap.Error(err))
 		return err
