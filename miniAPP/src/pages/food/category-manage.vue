@@ -205,6 +205,7 @@ const remove = (item) => {
   font-weight: 700; font-size: 34rpx; color: #6A4C93;
 }
 .add {
+  margin-left: 220px;
   background: linear-gradient(135deg, #FF7EB3 0%, #FF758C 100%);
   color:#fff; border:none; border-radius: 28rpx; padding: 16rpx 26rpx; font-size: 26rpx;
   box-shadow: 0 6rpx 16rpx rgba(255, 117, 140, 0.35);

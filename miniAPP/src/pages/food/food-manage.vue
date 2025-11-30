@@ -16,21 +16,58 @@
           </view>
         </picker>
       </view>
+      <view class="selector-item" v-if="categoryList.length > 0">
+        <text class="selector-label">分类：</text>
+        <picker 
+          :range="categoryFilterList" 
+          range-key="name" 
+          @change="onCategoryFilterChange"
+          :value="categoryFilterPickerValue"
+        >
+          <view class="picker-view">
+            <text :class="{ placeholder: selectedCategoryIdx < 0 }">
+              {{ selectedCategoryFilterName }}
+            </text>
+            <uni-icons type="arrowdown" size="16" color="#999"></uni-icons>
+          </view>
+        </picker>
+      </view>
     </view>
 
-    <view v-for="item in list" :key="item.ID" class="row">
-      <view class="left">
-        <image :src="item.img" class="thumb" mode="aspectFill" />
-        <view class="meta">
-          <text class="name">{{ item.name }}</text>
-          <text class="desc">分类：{{ getCategoryName(item.categoryId) }}</text>
+    <scroll-view 
+      class="scroll-container" 
+      scroll-y 
+      @scrolltolower="onScrollToLower"
+      :lower-threshold="100"
+    >
+      <view v-for="item in list" :key="item.ID" class="row">
+        <view class="left">
+          <image :src="item.img" class="thumb" mode="aspectFill" />
+          <view class="meta">
+            <text class="name">{{ item.name }}</text>
+            <text class="desc">分类：{{ getCategoryName(item.categoryId) }}</text>
+          </view>
+        </view>
+        <view class="ops">
+          <button size="mini" class="op-btn edit" @click="startEdit(item)">编辑</button>
+          <button size="mini" class="op-btn delete" @click="remove(item)">删除</button>
         </view>
       </view>
-      <view class="ops">
-        <button size="mini" class="op-btn edit" @click="startEdit(item)">编辑</button>
-        <button size="mini" class="op-btn delete" @click="remove(item)">删除</button>
+
+      <!-- 加载更多提示 -->
+      <view v-if="list.length > 0" class="load-more">
+        <uni-load-more 
+          :status="loadMoreStatus" 
+          :content-text="loadMoreText"
+        ></uni-load-more>
       </view>
-    </view>
+
+      <!-- 空状态 -->
+      <view v-if="list.length === 0 && !loading && selectedMenuId" class="empty-state">
+        <uni-icons type="folder-add" size="80" color="#ccc"></uni-icons>
+        <text class="empty-text">该分类下还没有菜品</text>
+      </view>
+    </scroll-view>
 
     <uni-popup ref="popup" type="center">
       <view class="dialog">
@@ -127,6 +164,13 @@ const form = ref({ name: '', desc: '', img: '', categoryId: null })
 const selectedCatIdx = ref(-1)
 const cropperImageUrl = ref('')
 
+// 分页相关
+const page = ref(1)
+const pageSize = ref(20)
+const hasMore = ref(true)
+const loading = ref(false)
+const loadingMore = ref(false)
+
 const selectedMenuName = computed(() => {
   if (selectedMenuIdx.value < 0) return ''
   return menuList.value[selectedMenuIdx.value]?.name || ''
@@ -135,6 +179,40 @@ const selectedMenuName = computed(() => {
 const selectedCategoryName = computed(() => {
   if (selectedCategoryIdx.value < 0) return ''
   return categoryList.value[selectedCategoryIdx.value]?.name || ''
+})
+
+// 分类筛选列表（包含"全部"选项）
+const categoryFilterList = computed(() => {
+  return [{ ID: null, name: '全部' }, ...categoryList.value]
+})
+
+// 选中的分类筛选名称
+const selectedCategoryFilterName = computed(() => {
+  if (selectedCategoryIdx.value < 0) return '全部'
+  const category = categoryList.value[selectedCategoryIdx.value]
+  return category?.name || '全部'
+})
+
+// 分类筛选的 picker 值（需要包含"全部"选项的索引）
+const categoryFilterPickerValue = computed(() => {
+  if (selectedCategoryIdx.value < 0) return 0
+  return selectedCategoryIdx.value + 1
+})
+
+// 加载更多状态
+const loadMoreStatus = computed(() => {
+  if (loadingMore.value) return 'loading'
+  if (!hasMore.value) return 'noMore'
+  return 'more'
+})
+
+// 加载更多文本
+const loadMoreText = computed(() => {
+  return {
+    contentdown: '上拉加载更多',
+    contentrefresh: '正在加载...',
+    contentnomore: '没有更多了'
+  }
 })
 
 const chooseImage = () => {
@@ -222,13 +300,6 @@ const loadMenus = async () => {
     const res = await api.getMenuList({ page: 1, pageSize: 100 })
     if (res?.code === 0) {
       menuList.value = res.data?.list || []
-      // 如果有菜谱，默认选择第一个
-      if (menuList.value.length > 0) {
-        selectedMenuIdx.value = 0
-        selectedMenuId.value = menuList.value[0].ID
-        loadCategories()
-        loadFoods()
-      }
     }
   } catch (e) {
     console.error('加载菜谱列表失败:', e)
@@ -255,17 +326,62 @@ const loadCategories = async () => {
 }
 
 // 加载菜品列表
-const loadFoods = async () => {
+const loadFoods = async (reset = true) => {
   if (!selectedMenuId.value) {
     list.value = []
+    hasMore.value = false
     return
   }
+  
+  if (reset) {
+    page.value = 1
+    list.value = []
+    hasMore.value = true
+    loading.value = true
+  } else {
+    if (!hasMore.value || loadingMore.value) return
+    loadingMore.value = true
+  }
+
   try {
-    const params = { page: 1, pageSize: 200, menuId: selectedMenuId.value }
+    const params = { 
+      page: page.value, 
+      pageSize: pageSize.value, 
+      menuId: selectedMenuId.value 
+    }
+    
+    // 如果选择了分类，添加 categoryId 参数
+    if (selectedCategoryId.value) {
+      params.categoryId = selectedCategoryId.value
+    }
+    
     const res = await api.getFoodList(params)
-    if (res?.code === 0) list.value = res.data?.list || []
+    if (res?.code === 0) {
+      const newList = res.data?.list || []
+      const total = res.data?.total || 0
+
+      if (reset) {
+        list.value = newList
+      } else {
+        list.value = [...list.value, ...newList]
+      }
+
+      // 判断是否还有更多数据
+      hasMore.value = list.value.length < total
+
+      // 只有在成功加载数据后才增加页码
+      if (!reset && newList.length > 0) {
+        page.value += 1
+      } else if (reset && hasMore.value) {
+        page.value = 2  // 重置后如果有更多数据，下次加载第2页
+      }
+    }
   } catch (e) {
     console.error('加载菜品列表失败:', e)
+    uni.showToast({ title: '加载失败', icon: 'none' })
+  } finally {
+    loading.value = false
+    loadingMore.value = false
   }
 }
 
@@ -276,7 +392,29 @@ const onMenuChange = (e) => {
   selectedCategoryIdx.value = -1
   selectedCategoryId.value = null
   loadCategories()
-  loadFoods()
+  loadFoods(true)
+}
+
+// 分类筛选变化
+const onCategoryFilterChange = (e) => {
+  const index = Number(e.detail.value)
+  if (index === 0) {
+    // 选择"全部"
+    selectedCategoryIdx.value = -1
+    selectedCategoryId.value = null
+  } else {
+    // 选择具体分类
+    selectedCategoryIdx.value = index - 1
+    selectedCategoryId.value = categoryList.value[index - 1]?.ID || null
+  }
+  loadFoods(true)
+}
+
+// 触底加载更多（scroll-view 的 scrolltolower 事件）
+const onScrollToLower = () => {
+  if (hasMore.value && !loading.value && !loadingMore.value) {
+    loadFoods(false)
+  }
 }
 
 // 分类选择变化（顶部筛选）- 已移除，分类在弹窗中选择
@@ -299,7 +437,20 @@ onMounted(() => {
         selectedMenuIdx.value = menuIndex
         selectedMenuId.value = routeMenuId
         loadCategories()
+        loadFoods(true)
+      } else if (menuList.value.length > 0) {
+        // 如果路由参数中的菜谱不存在，默认选择第一个
+        selectedMenuIdx.value = 0
+        selectedMenuId.value = menuList.value[0].ID
+        loadCategories()
+        loadFoods(true)
       }
+    } else if (menuList.value.length > 0) {
+      // 如果没有路由参数，默认选择第一个
+      selectedMenuIdx.value = 0
+      selectedMenuId.value = menuList.value[0].ID
+      loadCategories()
+      loadFoods(true)
     }
   })
 })
@@ -359,7 +510,7 @@ const save = async () => {
       uni.showToast({ title: '创建成功', icon: 'success' })
     }
     close()
-    loadFoods()
+    loadFoods(true)
   } catch (e) {
     console.error('保存菜品失败:', e)
     uni.showToast({ title: '操作失败', icon: 'none' })
@@ -375,7 +526,7 @@ const remove = (item) => {
         try {
           await api.deleteFood({ ID: item.ID })
           uni.showToast({ title: '删除成功', icon: 'success' })
-          loadFoods()
+          loadFoods(true)
         } catch (e) {
           console.error('删除菜品失败:', e)
           uni.showToast({ title: '删除失败', icon: 'none' })
@@ -388,14 +539,38 @@ const remove = (item) => {
 
 <style lang="scss" scoped>
 .container {
-  min-height: 100vh;
-  padding: 24rpx;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(135deg, #FFE4F0 0%, #F3E8FF 50%, #EDE7FF 100%);
 }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx; }
+
+.scroll-container {
+  flex: 1;
+  padding: 0 24rpx 24rpx;
+  box-sizing: border-box;
+  height: 0; /* 确保 flex: 1 正确计算高度 */
+}
+.header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 24rpx 24rpx 0;
+  flex-shrink: 0;
+}
 .title { font-weight: 700; font-size: 34rpx; color: #6A4C93; }
-.add { background: linear-gradient(135deg, #FF7EB3 0%, #FF758C 100%); color:#fff; border:none; border-radius: 28rpx; padding: 16rpx 26rpx; font-size: 26rpx; box-shadow: 0 6rpx 16rpx rgba(255, 117, 140, 0.35); }
-.selectors { background: rgba(255,255,255,0.9); padding: 20rpx; border-radius: 18rpx; margin-bottom: 18rpx; display: flex; flex-direction: column; gap: 16rpx; box-shadow: 0 8rpx 24rpx rgba(140, 82, 255, 0.12); }
+.add {margin-left: 220px; background: linear-gradient(135deg, #FF7EB3 0%, #FF758C 100%); color:#fff; border:none; border-radius: 28rpx; padding: 16rpx 26rpx; font-size: 26rpx; box-shadow: 0 6rpx 16rpx rgba(255, 117, 140, 0.35); }
+.selectors { 
+  background: rgba(255,255,255,0.9); 
+  padding: 20rpx; 
+  border-radius: 18rpx; 
+  margin: 24rpx 24rpx 0;
+  display: flex; 
+  flex-direction: column; 
+  gap: 16rpx; 
+  box-shadow: 0 8rpx 24rpx rgba(140, 82, 255, 0.12);
+  flex-shrink: 0;
+}
 .selector-item { display: flex; align-items: center; gap: 16rpx; }
 .selector-label { font-size: 28rpx; color: #6A4C93; font-weight: 600; min-width: 120rpx; }
 .picker-view { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 12rpx 20rpx; background: #faf7ff; border-radius: 12rpx; color: #3C2A4D; }
@@ -558,6 +733,26 @@ const remove = (item) => {
     background: #ccc;
     color: #999;
     box-shadow: none;
+  }
+}
+
+.load-more {
+  padding: 30rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  gap: 20rpx;
+
+  .empty-text {
+    font-size: 28rpx;
+    color: #999;
   }
 }
 </style> 
